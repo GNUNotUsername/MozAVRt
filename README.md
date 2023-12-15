@@ -57,3 +57,7 @@ None yet
 # Conjunction
 
 Both Musi-CC and MozAVRt can be run at once using a script which is coming later
+
+# Samples
+
+Sample music PDFs can be found in the ```samples``` directory.
