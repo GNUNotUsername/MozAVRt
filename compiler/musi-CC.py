@@ -1,5 +1,5 @@
 """
-Compile a sheet music PNG into machine interpretable pitch and duration data
+Compile a sheet music PDF into machine interpretable pitch and duration data
 
 Usage:  python musi-CC.py in-path out-path
 """
