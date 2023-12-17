@@ -36,6 +36,8 @@ where ```<music path>``` is the path to the sheet music PDF and ```<pbuf path>``
 * Dynamics are ignored as the specific piezo buzzers used during development and testing do not respond well enough to duty cycling to adequately recreate changes in dynamics.
 * Lyrics under vocal parts are ignored obvious reasons.
 * Any non-standard note heads (cross heads, triangle heads etc) are ignored because their meaning is not consistent between scores.
+* Breath marks, caesuras and fermatas are ignored because it's annoying to factor them in to the tone set timings.
+* Tenutos, accents, marcatos, pizzicatos, arcos and piano pedaling are ignored because they're meaningless to piezo buzzers.
 
 
 # MozAVRt
