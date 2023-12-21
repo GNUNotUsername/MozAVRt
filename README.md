@@ -56,6 +56,11 @@ TBD
 
 None yet
 
+## Dependencies
+* AVR-GCC
+* AVR-LibC
+* AVRDude
+
 # Conjunction
 
 Both Musi-CC and MozAVRt can be run at once using a script which is coming later
