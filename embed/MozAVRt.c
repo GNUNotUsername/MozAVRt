@@ -1,17 +1,39 @@
-#include <avr/io.h>
-#include <util/delay.h>
+#include <stdint.h>
 
-#define F_CPU 8000000L
+#include <avr/io.h>
+
+
+/*      DDR     */
+#define DD_IN   0x00
+#define DD_OUT  0xFF
+
+
+typedef struct Note {
+    uint64_t    start;
+    uint64_t    stop;
+    double      freq;
+    struct Note *next;
+};
+
+
+void init_hardware();
+
 
 int main (void) {
-    DDRC = 255; // MAKE ALL PORT D PINS OUTPUTS
-
-    while (1) {
-        PORTC = 255;
-        _delay_ms(100);
-        PORTC = 0;
-        _delay_ms(100);
-    }
+    init_hardware();
 
     return (0);
+}
+
+
+void init_hardware() {
+    DDRA    = DD_OUT;
+    DDRB    = DD_IN;
+    DDRC    = DD_IN;
+    DDRD    = DD_IN;
+    TCCR1A  = 0;
+    TCCR1B  = (1 << WGM12) | (1 << CS11);
+    TCCR1C  = 0;
+    OCR1A   = 999;
+    // TODO when usart is implemented, it will go here
 }
