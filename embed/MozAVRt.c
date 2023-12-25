@@ -29,7 +29,7 @@ Note    *fill_note      (uint64_t,  uint64_t,   uint8_t );
 uint8_t             usedTracks;
 
 volatile uint64_t   time;
-volatile uint64_t   switchTimes[NO_TRACKS];
+//volatile uint64_t   switchTimes[NO_TRACKS];
 volatile uint64_t   lastOscillations[NO_TRACKS];
 volatile Note       *currentNotes[NO_TRACKS];
 
@@ -82,7 +82,7 @@ void receive_music() {
     Note *prev = NULL;
     Note *add = NULL;
     Note *head = NULL;
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 15; i++) {
         add = fill_note(starts[i], ends[i], note_inds[i]);
         if (prev) prev->next = add;
         if (!head) head = add;
@@ -103,5 +103,20 @@ Note *fill_note(uint64_t start, uint64_t end, uint8_t note) {
 
 
 ISR(TIMER1_COMPA_vect) {
+    uint8_t track;
+    Note    *check;
+
     time++;
+    for (track = 0; track < usedTracks; track++) {
+        check = currentNotes[track];
+        if (check->stop >= time) {
+            currentNotes[track] = check->next;
+            check = check->next;
+            lastOscillations[track] = time;
+        }
+        if ((time - lastOscillations[track]) >= check->period) {
+            PORTA ^= (1 << track);
+            lastOscillations[track] = time;
+        }
+    }
 }
