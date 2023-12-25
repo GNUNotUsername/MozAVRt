@@ -41,6 +41,7 @@ where ```<music path>``` is the path to the sheet music PDF and ```<pbuf path>``
 
 ## Dependencies:
 * pdftoppm
+* ImageMagick
 * python-subprocess
 
 
