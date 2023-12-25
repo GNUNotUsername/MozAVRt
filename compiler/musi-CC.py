@@ -6,7 +6,7 @@ Usage:  python musi-CC.py in-path out-path
 
 
 from hashlib    import sha256
-from os         import mkdir
+from os         import listdir, mkdir, rename
 from shutil     import rmtree
 from subprocess import DEVNULL, run
 from sys        import argv
@@ -17,7 +17,8 @@ CORRECT_ARGV    = 3
 NO_PROGNAME     = 1
 
 # Error Messages
-CANNOT_CONVERT  = "Cannot convert the specified PDF"
+CANNOT_CONCAT   = "Cannot concatenate PDF pages."
+CANNOT_CONVERT  = "Cannot convert the specified PDF."
 CANNOT_CREATE   = "Cannot create temporary directory."
 USAGE           = "Usage: python musi-CC.py in-path out-path"
 
@@ -26,13 +27,37 @@ GOOD            = 0
 BAD_ARGV        = 1
 BAD_TEMPDIR     = 2
 BAD_MUSIC       = 3
+MAGICK_FAIL     = 4
 
 # File Conversions
-PDF2PNG         = lambda p, d : ["pdftoppm", "-gray", "-png", p, f"{d}/-"]
+CONCAT_IMGS     = lambda d      : ["magick", f"{d}/*", "-append", f"{d}/working.png"]
+PDF2PNG         = lambda p, d   : ["pdftoppm", "-gray", "-png", p, f"{d}/-"]
 
 # Pathing
 HIDDEN          = "."
 STR_ENCODING    = "utf-8"
+
+
+"""
+Convert a PDF into a greyscale png within the a temporary directory
+
+path_in - path of PDF to convert
+dirname - path of temporary directory
+"""
+def convert_pdf(path_in, dirname):
+    if run(PDF2PNG(path_in, dirname), stdout = DEVNULL, stderr = DEVNULL).returncode:
+        rmtree(dirname)
+        print(CANNOT_CONVERT)
+        exit(BAD_MUSIC)
+
+    if len(listdir(dirname)) != 1:
+        if run(CONCAT_IMGS(dirname)).returncode:
+            rmtree(dirname)
+            print(CANNOT_CONCAT)
+            exit(MAGICK_FAIL)
+    else:
+        rename(f"{dirname}/--1.png", WORKING)
+
 
 
 """
@@ -53,6 +78,15 @@ def gen_temp_dir(base):
     return dirname
 
 
+"""
+Send all pixels in the working PNG to either 0x000000 or 0xFFFFFF
+
+tempdir - temporary directory holding working PNGs
+"""
+def heighten_contrast(tempdir):
+    pass
+
+
 def main():
     if len(argv) != CORRECT_ARGV:
         print(USAGE)
@@ -60,10 +94,8 @@ def main():
 
     path_in, path_out = tuple(argv[NO_PROGNAME:])
     dirname = gen_temp_dir(path_in)
-    if run(PDF2PNG(path_in, dirname), stdout = DEVNULL, stderr = DEVNULL).returncode:
-        rmtree(dirname)
-        print(CANNOT_CONVERT)
-        exit(BAD_MUSIC)
+    convert_pdf(path_in, dirname)
+    heighten_contrast(dirname)
 
     #rmtree(dirname)
 
