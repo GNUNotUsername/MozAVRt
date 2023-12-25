@@ -7,8 +7,9 @@ Usage:  python musi-CC.py in-path out-path
 
 from hashlib    import sha256
 from os         import mkdir
+from shutil     import rmtree
+from subprocess import DEVNULL, run
 from sys        import argv
-from subprocess import run
 
 
 # Cliargs
@@ -16,6 +17,7 @@ CORRECT_ARGV    = 3
 NO_PROGNAME     = 1
 
 # Error Messages
+CANNOT_CONVERT  = "Cannot convert the specified PDF"
 CANNOT_CREATE   = "Cannot create temporary directory."
 USAGE           = "Usage: python musi-CC.py in-path out-path"
 
@@ -23,6 +25,10 @@ USAGE           = "Usage: python musi-CC.py in-path out-path"
 GOOD            = 0
 BAD_ARGV        = 1
 BAD_TEMPDIR     = 2
+BAD_MUSIC       = 3
+
+# File Conversions
+PDF2PNG         = lambda p, d : ["pdftoppm", "-gray", "-png", p, f"{d}/-"]
 
 # Pathing
 HIDDEN          = "."
@@ -54,7 +60,12 @@ def main():
 
     path_in, path_out = tuple(argv[NO_PROGNAME:])
     dirname = gen_temp_dir(path_in)
+    if run(PDF2PNG(path_in, dirname), stdout = DEVNULL, stderr = DEVNULL).returncode:
+        rmtree(dirname)
+        print(CANNOT_CONVERT)
+        exit(BAD_MUSIC)
 
+    #rmtree(dirname)
 
     return GOOD
 

@@ -39,6 +39,10 @@ where ```<music path>``` is the path to the sheet music PDF and ```<pbuf path>``
 * Breath marks, caesuras and fermatas are ignored because it's annoying to factor them in to the tone set timings.
 * Tenutos, accents, marcatos, pizzicatos, arcos and piano pedaling are ignored because they're meaningless to piezo buzzers.
 
+## Dependencies:
+* pdftoppm
+* python-subprocess
+
 
 # MozAVRt
 
