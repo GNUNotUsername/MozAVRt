@@ -42,6 +42,7 @@ where ```<music path>``` is the path to the sheet music PDF and ```<pbuf path>``
 * Grainy or low-quality sheet music (e.g. low resolution scans) will produce less accurate tone sets due to added noise.
 * Similarly, low-contrast sheet music (e.g. bad photocopies which get a greyish background) will produce less accurate tone sets.
 * Anything silly such as white music written on a black background will almost certainly not work.
+* If there is no time signature given in the top left corner of the first page of music, a tempo of 100BPM will be assumed. This may or may not make tunes sound terrible.
 
 ## Dependencies:
 * pdftoppm
