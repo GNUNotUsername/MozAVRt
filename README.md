@@ -9,12 +9,11 @@ This program uses a slew of image segmentation and pattern recognition technique
 
 * A sheet music PDF is read in.
 * The PDF is converted to greyscale PNG(s) and concatenated together in the event the original PDF had several pages.
-* Contrast is heightened such that details are easier to distinguish.
-* A vertical column on each page is scanned to create rough boundaries around the musical staves.
+* Contrast is heightened and noisy borders are cropped such that details are easier to distinguish.
 * A YOLO-network is used to segment the musical components (notes, accidentals, repeats etc) on each staff and record their positions.
-* Each identified musical component is fed into a classifier CNN to convert it into an enumerated/tokenised form.
-* Tokens are reassembled in order, into a pseudo-abstract syntax tree per instrumental part.
-* The syntax tree for each part is "compiled" into a set of frequencies, start timestamps and stop timestamps.
+* Each identified musical component is fed into a classifier to convert it into an enumerated/tokenised form.
+* Tokens are reassembled in order into a pseudo-abstract syntax tree per instrumental part.
+* The syntax tree for each part is "compiled" into a set of wave periods, start timestamps and stop timestamps.
 * These tone sets are serialised onto disk using protocol buffers.
 
 The format of the tone set protocol buffers are illustrated in the below diagram:
@@ -29,15 +28,20 @@ The code for this can be found in the ```compiler``` directory.
 
 where ```<music path>``` is the path to the sheet music PDF and ```<pbuf path>``` is the path to where the tone set protocol buffers should be written.
 
-## Notes:
-* Some details are intentionally discarded by the compiler.
+## Intentional Omissions:
 * Any staves with a percussion clef are ignored as there is no adequate way of mimicking percussion noises with piezo buzzers.
-* Any guitar tablature staves are ignored because tablature is a staggeringly crap way of notating music. Guitarists are to blame for this.
+* Any guitar tablature staves are ignored because tablature is a staggeringly bad way of notating music. Guitarists are to blame for this.
 * Dynamics are ignored as the specific piezo buzzers used during development and testing do not respond well enough to duty cycling to adequately recreate changes in dynamics.
-* Lyrics under vocal parts are ignored obvious reasons.
+* Lyrics under vocal parts are ignored for obvious reasons.
 * Any non-standard note heads (cross heads, triangle heads etc) are ignored because their meaning is not consistent between scores.
-* Breath marks, caesuras and fermatas are ignored because it's annoying to factor them in to the tone set timings.
-* Tenutos, accents, marcatos, pizzicatos, arcos and piano pedaling are ignored because they're meaningless to piezo buzzers.
+* Breath marks, caesuras and fermatas are ignored because it is annoying to factor them in to the tone set timings.
+* Tenutos, accents, marcatos, pizzicatos, arcos and piano pedaling are ignored because they are meaningless to piezo buzzers.
+
+## Limitations:
+* This uses neural networks, which are inherently probabilistic and will eventually get something wrong.
+* Grainy or low-quality sheet music (e.g. low resolution scans) will produce less accurate tone sets due to added noise.
+* Similarly, low-contrast sheet music (e.g. bad photocopies which get a greyish background) will produce less accurate tone sets.
+* Anything silly such as white music written on a black background will almost certainly not work.
 
 ## Dependencies:
 * pdftoppm
@@ -52,6 +56,9 @@ This program is far more straightforward. It deserialises the tone data protocol
 (Schematic also coming to the same README.md near you)
 
 The code running on the ATMega324A board can be found in the ```embed``` directory and the code to deserialise and transmit the tone set protocol buffers is found in the ```transmission``` directory.
+
+## Transmission Protocol:
+The protocol used to transmit the tone set to the AVR board over USART is yet again coming soon to the same README.md near you.
 
 ## Usage:
 
